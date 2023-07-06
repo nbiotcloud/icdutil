@@ -24,16 +24,4 @@
 """
 IC Utilities.
 """
-
-
-# def examplefunc(first, second=1):
-#     """
-#     Example Function.
-
-#     Args:
-#         first: The important argument.
-
-#     Keyword Args:
-#         second: The optional argument.
-#     """
-#     return first + second
+from . import num, slices

@@ -26,5 +26,4 @@ quick-html: Makefile
 
 api:
 	sphinx-apidoc --output-dir api .. ../icdutil/cli ../docs ../tests $(wildcard ../*.py) $(APIOPTS)
-	rm api/icdutil.rst
 .PHONY: api

@@ -14,7 +14,7 @@ API
 .. toctree::
    :maxdepth: 2
 
-   api/icdutil.num
+   api/icdutil
 
 
 Indices and tables
