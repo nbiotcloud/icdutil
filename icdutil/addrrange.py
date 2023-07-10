@@ -36,9 +36,9 @@ from mementos import mementos
 class AddrRange(mementos):
     """Address range starting at `baseaddr` with `size` in bytes."""
 
-    baseaddr:Hex = field()
-    size:Bytes = field()
-    addrwidth:int = field()
+    baseaddr: Hex = field()
+    size: Bytes = field()
+    addrwidth: typing.Optional[int] = field()
 
     def __init__(self, baseaddr: int, size: int, addrwidth: typing.Optional[int] = None) -> None:
         """
