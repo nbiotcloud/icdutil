@@ -27,6 +27,8 @@
 import math
 import typing
 
+from .addrrange import AddrRange
+
 
 class AlignError(RuntimeError):
     """Alignment Error."""
@@ -698,3 +700,57 @@ def calc_addrwinmasks(baseaddr, size, addrwidth=32, dontcare="?") -> typing.Tupl
     """
     assert len(dontcare) == 1, f"dontcare '{dontcare}' shall have length of 1"
     return tuple(to_mask(addrwidth, base, exp, dontcare) for base, exp in _iter_powerof2_segs(baseaddr, size))
+
+
+def _iter_aligned_segs(baseaddr: int, size: int) -> typing.Generator[AddrRange, None, None]:
+    endaddr = baseaddr + size - 1
+    # search largest chunk fitting aligned into window of size
+    sizeup = calc_next_power_of2(size)
+    baseup = align(baseaddr, nxtalign=sizeup)
+    end = baseup + size - 1
+    while end > endaddr:
+        sizeup //= 2
+        size = sizeup
+        baseup = align(baseaddr, nxtalign=sizeup)
+        end = baseup + size - 1
+    assert baseaddr <= baseup
+    # before chunk
+    pre_size = baseup - baseaddr
+    if pre_size > 0:
+        yield from _iter_aligned_segs(baseaddr, pre_size)
+    # chunk
+    yield AddrRange(baseup, size)
+    # after chunk
+    post_size = endaddr - end
+    if post_size > 0:
+        yield from _iter_aligned_segs(end + 1, post_size)
+
+
+def split_aligned_segs(baseaddr: int, size: int) -> typing.Tuple[AddrRange, ...]:
+    """
+    Split address window starting at `baseaddr` with `size` into segments with aligned base addresses.
+
+    The base addresses of the segments are aligned to `calc_next_power_of2(size)`.
+
+    Returns tuple of :any:`AddrRange`. Segment starting at `baseaddr` with `size`.
+
+    Args:
+        baseaddr (int): Address window start addresss
+        size (int):     Address window size
+
+    Example:
+
+    >>> split_aligned_segs(0, 1)
+    (AddrRange(0x0, '1 byte'),)
+    >>> split_aligned_segs(1024, 16)
+    (AddrRange(0x400, '16 bytes'),)
+    >>> split_aligned_segs(1024, 1024)
+    (AddrRange(0x400, '1 KB'),)
+    >>> split_aligned_segs(1024, 1024+768)
+    (AddrRange(0x400, '1 KB'), AddrRange(0x800, '768 bytes'))
+    >>> split_aligned_segs(256, 1024+768)
+    (AddrRange(0x100, '256 bytes'), AddrRange(0x200, '512 bytes'), AddrRange(0x400, '1 KB'))
+    >>> split_aligned_segs(1000, 1024)  # doctest: +ELLIPSIS
+    (AddrRange(0x3E8, '8 bytes'), AddrRange(0x3F0, '16 bytes'), AddrRange(0x400, '512 bytes'), ...(0x600, '488 bytes'))
+    """
+    return tuple(_iter_aligned_segs(baseaddr, size))
