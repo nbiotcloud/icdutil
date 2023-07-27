@@ -447,13 +447,13 @@ class AddrMap:
                 if last < end:
                     yield AddrRange(baseaddr=last, size=end - last, addrwidth=self.addrwidth, item=default)
 
-    def __new(self, addrranges: list[AddrRange]) -> "AddrMap":
+    def __new(self, addrranges: typing.List[AddrRange]) -> "AddrMap":
         addrmap = AddrMap(addrwidth=self.addrwidth, is_sub=self.is_sub)
         addrranges = addrranges or []
         addrmap.cp_addrranges(addrranges)
         return addrmap
 
-    def __cut(self, addrrange) -> list[AddrRange]:
+    def __cut(self, addrrange) -> typing.List[AddrRange]:
         addrranges = self.__addrranges
         idxs = []
         cuts = []
@@ -521,7 +521,7 @@ class AddrMap:
                     f"No space left in address map ({Bytes(addrspace)}) for new range at {addr} with size of {size}"
                 )
 
-    def cp_addrranges(self, addranges: list[AddrRange]) -> None:
+    def cp_addrranges(self, addranges: typing.List[AddrRange]) -> None:
         """Copy address ranges from `other` AddrMap."""
         for addrrange in addranges:
             self.__add(addrrange)
