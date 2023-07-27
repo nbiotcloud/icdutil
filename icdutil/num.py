@@ -396,17 +396,18 @@ def calc_prev_power_of(value: int, base: int = 2):
     return base**exp
 
 
+# pylint: disable=redefined-outer-name
 def align(
     value: int,
     offset: typing.Optional[int] = None,
-    nxtalign: typing.Optional[int] = None,
+    align: typing.Optional[int] = None,
     minalign: int = 1,
     rewind=False,
 ):
     """
-    Forward `value` to `offset` and `nxtalign` and `minalign`.
+    Forward `value` to `offset` and `align` and `minalign`.
 
-    Without `offset` and `nxtalign` nothing happens.
+    Without `offset` and `align` nothing happens.
 
     >>> align(5)
     5
@@ -422,16 +423,16 @@ def align(
         ...
     icdutil.num.AlignError: Cannot use offset 3 as we are already at 5
 
-    A `nxtalign` forwards the value to the next multiple of `nxtalign`.
+    A `align` forwards the value to the next multiple of `align`.
 
-    >>> align(5, nxtalign=4)
+    >>> align(5, align=4)
     8
-    >>> align(8, nxtalign=4)
+    >>> align(8, align=4)
     8
-    >>> align(9, nxtalign=4)
+    >>> align(9, align=4)
     12
 
-    A `minalign` without `nxtalign` forwards the value to the next multiple of `minalign`
+    A `minalign` without `align` forwards the value to the next multiple of `minalign`
     >>> align(5, minalign=4)
     8
     >>> align(8, minalign=4)
@@ -439,22 +440,22 @@ def align(
     >>> align(9, minalign=4)
     12
 
-    If both `nxtalign` and `minalign` are given, then the value is moved to the next multiple
+    If both `align` and `minalign` are given, then the value is moved to the next multiple
     of whichever of the both align values is bigger
-    >>> align(8, nxtalign=5, minalign=4)
+    >>> align(8, align=5, minalign=4)
     10
-    >>> align(8, nxtalign=4, minalign=6)
+    >>> align(8, align=4, minalign=6)
     12
 
-    If `offset` is given it is dominant over both `nxtalign` and `minalign`
-    >>> align(8, offset=9, nxtalign=4, minalign=6)
+    If `offset` is given it is dominant over both `align` and `minalign`
+    >>> align(8, offset=9, align=4, minalign=6)
     9
     """
     if offset is not None:
         if not rewind and value > offset:
             raise AlignError(f"Cannot use offset {offset} as we are already at {value}")
         return offset
-    curalign = max(nxtalign, minalign) if nxtalign is not None else minalign
+    curalign = max(align, minalign) if align is not None else minalign
     misalign = value % curalign
     if misalign:
         value += curalign - misalign
@@ -661,7 +662,7 @@ def _iter_powerof2_segs(baseaddr: int, size: int) -> typing.Generator[typing.Tup
     bits = 0
     for bits in reversed(range(size.bit_length())):
         csize = 1 << bits
-        cbase = align(baseaddr, nxtalign=csize)
+        cbase = align(baseaddr, align=csize)
         cend = cbase + csize - 1
         if bits and cend <= endaddr:
             break
@@ -706,12 +707,12 @@ def _iter_aligned_segs(baseaddr: int, size: int) -> typing.Generator[AddrRange, 
     endaddr = baseaddr + size - 1
     # search largest chunk fitting aligned into window of size
     sizeup = calc_next_power_of2(size)
-    baseup = align(baseaddr, nxtalign=sizeup)
+    baseup = align(baseaddr, align=sizeup)
     end = baseup + size - 1
     while end > endaddr:
         sizeup //= 2
         size = sizeup
-        baseup = align(baseaddr, nxtalign=sizeup)
+        baseup = align(baseaddr, align=sizeup)
         end = baseup + size - 1
     assert baseaddr <= baseup
     # before chunk

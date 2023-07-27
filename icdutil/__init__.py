@@ -24,4 +24,4 @@
 """
 IC Utilities.
 """
-from . import num, slices
+from . import addrmap, addrrange, num, slices
