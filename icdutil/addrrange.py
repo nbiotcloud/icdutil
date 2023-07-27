@@ -266,7 +266,7 @@ class AddrRange(mementos):
             return None
         raise IntersectError(f"No intersection between {self!r} and {other!r}.")
 
-    def get_difference(self, other: "AddrRange") -> list["AddrRange"]:
+    def get_difference(self, other: "AddrRange") -> typing.List["AddrRange"]:
         """
         Get difference of `self` and `other`.
 
