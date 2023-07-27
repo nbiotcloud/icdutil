@@ -241,7 +241,8 @@ class AddrRange(mementos):
 
         The item and aaddrwidth of the intersection is always inherited from `self`.
 
-        >>> AddrRange(0x2000, '1 MB', item='A', addrwidth=20).get_intersect(AddrRange(0x5000, '4 KB', item='B', addrwidth=24))
+        >>> AddrRange(0x2000, '1 MB', item='A', addrwidth=20).get_intersect(
+        ...    AddrRange(0x5000, '4 KB', item='B', addrwidth=24))
         AddrRange('A', 0x05000, '4 KB', addrwidth=20)
         """
 
