@@ -433,6 +433,7 @@ def align(
     12
 
     A `minalign` without `align` forwards the value to the next multiple of `minalign`
+
     >>> align(5, minalign=4)
     8
     >>> align(8, minalign=4)
@@ -442,12 +443,14 @@ def align(
 
     If both `align` and `minalign` are given, then the value is moved to the next multiple
     of whichever of the both align values is bigger
+
     >>> align(8, align=5, minalign=4)
     10
     >>> align(8, align=4, minalign=6)
     12
 
     If `offset` is given it is dominant over both `align` and `minalign`
+
     >>> align(8, offset=9, align=4, minalign=6)
     9
     """

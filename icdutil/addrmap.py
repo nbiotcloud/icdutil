@@ -82,7 +82,8 @@ class AddrMap:
         ...
     icdutil.addrmap.Conflict: AddrRange('D', 0x1800, '4 KB'): overlaps with AddrRange('B', 0x2000, '4 KB').
 
-    An iteration will serve :class:`AddrRange` objects sorted by baseaddr.
+    An iteration will serve :class:`AddrRange` objects sorted by baseaddr:
+
     >>> for addrrange in a:
     ...     addrrange
     AddrRange('T', 0x0, '1 KB')
@@ -91,7 +92,6 @@ class AddrMap:
     AddrRange('C', 0xD000, '2 KB')
     AddrRange('Z', 0xE000, '4 KB')
     AddrRange('X', 0xF0800000, '3 MB')
-
 
     The size is defined by the numer of entries:
 
@@ -117,7 +117,7 @@ class AddrMap:
     >>> len(tuple(a.get('d')))
     12
 
-    The `is_sub` attribute defines the address range defaults.
+    The `is_sub` attribute defines the address range defaults:
 
     >>> b = AddrMap(addrwidth=32, is_sub=True)
     >>> b
@@ -241,7 +241,7 @@ class AddrMap:
         """
         Effective Address Width.
 
-        Return address with if explicitly set or calculated from existing entries.
+        Return address width, either explicitly set or calculated from existing entries.
 
         >>> a = AddrMap()
         >>> a.eff_addrwidth
@@ -471,23 +471,18 @@ class AddrMap:
                 addrranges.pop(idx)
             # re-add left overlap
             if addrrange.baseaddr:
-                # left = first.get_intersect(AddrRange(0, addrrange.baseaddr))
-                # print("BOZO", first, addrrange)
                 left = first.get_difference(addrrange)
                 if left:
                     self.__add(left[0])
             # re-add right overlap
             if lastaddr > addrrange.endaddr:
-                # right = last.get_intersect(AddrRange(addrrange.endaddr + 1, lastaddr - addrrange.endaddr))
                 right = last.get_difference(addrrange)
                 if right:
                     self.__add(right[0])
             # shrink cuts
             cuts[0] = first.get_intersect(addrrange)
-            # cuts[0] = first.get_difference(addrrange)[0]
             if first is not last:
                 cuts[-1] = last.get_intersect(addrrange)
-                # cuts[-1] = last.get_difference(addrrange)[0]
         return cuts
 
     def __match(self, addrrange: "AddrRange"):
@@ -668,7 +663,7 @@ class AddrMap:
         >>> list(a.get(default="<default>"))
         [AddrRange('<default>', 0x0000, '64 KB', addrwidth=16)]
 
-        # default items before and after real AddrRange:
+        Default items before and after real AddrRange:
 
         >>> a.add('A', 0x5000, 0x1000)
         AddrRange('A', 0x5000, '4 KB', addrwidth=16)
@@ -693,7 +688,7 @@ class AddrMap:
         """
         Cut out address range from `baseaddr` for `size`.
 
-        Return address map with cutted address ranges.
+        Return address map with cut address ranges.
 
         >>> a = AddrMap()
         >>> a.add('A', 0x0000, 0x1000)

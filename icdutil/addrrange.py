@@ -76,23 +76,27 @@ class AddrRange(mementos):
         >>> str(a.nextaddr)
         '0x00001100'
 
-        Address ranges can be compared
+        Address ranges can be compared:
+
         >>> AddrRange(0x1000, 0x100) == AddrRange(0x1000, 0x100)
         True
         >>> AddrRange(0x1000, 0x100) == AddrRange(0x1000, 0x200)
         False
 
         Comparing an AddrRange against another type just returns False:
+
         >>> AddrRange(0x1000, 0x100) == 42
         False
 
-        Addresses can be checked whether they lie within the range
+        Addresses can be checked whether they lie within the range:
+
         >>> 0x1008 in a
         True
         >>> 0x1400 in a
         False
 
-        Address ranges can be iterated over
+        Address ranges can be iterated over:
+
         >>> for i in AddrRange(0x200, 6):
         ...     print(i)
         512
@@ -189,7 +193,8 @@ class AddrRange(mementos):
         >>> AddrRange(0x1000, '4 KB').get_intersect(AddrRange(0x1FFF, 0x1))
         AddrRange(0x1FFF, '1 byte')
 
-        Remark: This should not be 4 KB, but 4095, this is a quirk of the humandfriendly package!
+        Remark: humandfriendly package is rounding 4095 bytes to 4 KB.
+
         >>> a = AddrRange(0x1000, '4 KB').get_intersect(AddrRange(0x1000, 0xFFF))
         >>> a
         AddrRange(0x1000, '4 KB')
@@ -300,6 +305,7 @@ class AddrRange(mementos):
 
         If only one of the AddrRange is absolute, the sub range is taken relative to the absolute.
         If `self` is a subrange, then the difference is again a subrange w/r/t to the absolute range.
+
         >>> AddrRange(0x1000, '4 KB').get_difference(AddrRange(0x2000, '4 KB', is_sub=True))
         [AddrRange(0x1000, '4 KB')]
         >>> AddrRange(0x1000, '4 KB', is_sub=True).get_difference(AddrRange(0x2000, '4 KB'))
@@ -315,6 +321,7 @@ class AddrRange(mementos):
 
         Regardless of the `other` range, the difference always inherits addrwidth, the item (if there is any) and
         the is_sub attribute:
+
         >>> AddrRange(0x1000, '4 KB', item='A').get_difference(AddrRange(0x1800, '4 KB', item='B'))
         [AddrRange('A', 0x1000, '2 KB')]
         >>> AddrRange(0x1000, '4 KB', addrwidth=16).get_difference(AddrRange(0x1800, '4 KB', addrwidth=18))
