@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 nbiotcloud
+# Copyright (c) 2023-2025 nbiotcloud
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,8 @@
 
 """IC Design Related Slice Handling."""
 
-
 import enum
 import re
-from typing import Optional, Union
 
 from attrs import field, frozen
 from mementos import mementos
@@ -46,77 +44,76 @@ UP = SliceDirection.UP
 
 @frozen(init=False, repr=False, str=False)
 class Slice(mementos):
-
     """
     Bit slice of `width` bits starting at bit position `left` or `right`.
 
-    >>> s = Slice(right=6, left=9)
-    >>> s
-    Slice('9:6')
-    >>> s.left
-    9
-    >>> s.right
-    6
-    >>> s.width
-    4
-    >>> str(s)
-    '9:6'
-    >>> s.mask
-    960
-    >>> s.direction
-    <SliceDirection.DOWN: 0>
-    >>> s.slice
-    slice(9, 6, -1)
+        >>> s = Slice(right=6, left=9)
+        >>> s
+        Slice('9:6')
+        >>> s.left
+        9
+        >>> s.right
+        6
+        >>> s.width
+        4
+        >>> str(s)
+        '9:6'
+        >>> s.mask
+        960
+        >>> s.direction
+        <SliceDirection.DOWN: 0>
+        >>> s.slice
+        slice(9, 6, -1)
 
-    >>> s = Slice(left=6, right=9)
-    >>> s
-    Slice('6:9')
-    >>> s.left
-    6
-    >>> s.right
-    9
-    >>> s.width
-    4
-    >>> str(s)
-    '6:9'
-    >>> s.mask
-    960
-    >>> s.direction
-    <SliceDirection.UP: 1>
-    >>> s.slice
-    slice(6, 9, 1)
+        >>> s = Slice(left=6, right=9)
+        >>> s
+        Slice('6:9')
+        >>> s.left
+        6
+        >>> s.right
+        9
+        >>> s.width
+        4
+        >>> str(s)
+        '6:9'
+        >>> s.mask
+        960
+        >>> s.direction
+        <SliceDirection.UP: 1>
+        >>> s.slice
+        slice(6, 9, 1)
 
-    >>> Slice(left=7, right=4) in Slice(left=7, right=4)
-    True
-    >>> Slice(left=7, right=5) in Slice(left=7, right=4)
-    True
-    >>> Slice(left=6, right=4) in Slice(left=7, right=4)
-    True
-    >>> Slice(left=7, right=4) in Slice(left=6, right=4)
-    False
-    >>> Slice(left=7, right=4) in Slice(left=7, right=5)
-    False
-    >>> Slice(left=7, right=5) in Slice(left=4, right=7)
-    False
+        >>> Slice(left=7, right=4) in Slice(left=7, right=4)
+        True
+        >>> Slice(left=7, right=5) in Slice(left=7, right=4)
+        True
+        >>> Slice(left=6, right=4) in Slice(left=7, right=4)
+        True
+        >>> Slice(left=7, right=4) in Slice(left=6, right=4)
+        False
+        >>> Slice(left=7, right=4) in Slice(left=7, right=5)
+        False
+        >>> Slice(left=7, right=5) in Slice(left=4, right=7)
+        False
 
-    >>> Slice('2:1')
-    Slice('2:1')
-    >>> Slice('1:2')
-    Slice('1:2')
-    >>> Slice(2)
-    Slice('2')
-    >>> Slice(right=2)
-    Slice('2')
-    >>> Slice(right=2, left=3)
-    Slice('3:2')
-    >>> Slice.cast(slice(2, 1))
-    Slice('2:1')
-    >>> Slice.cast(slice(1, 2))
-    Slice('1:2')
-    >>> Slice('')
-    Traceback (most recent call last):
-      ...
-    ValueError: Invalid Slice Specification ''
+        >>> Slice('2:1')
+        Slice('2:1')
+        >>> Slice('1:2')
+        Slice('1:2')
+        >>> Slice(2)
+        Slice('2')
+        >>> Slice(right=2)
+        Slice('2')
+        >>> Slice(right=2, left=3)
+        Slice('3:2')
+        >>> Slice.cast(slice(2, 1))
+        Slice('2:1')
+        >>> Slice.cast(slice(1, 2))
+        Slice('1:2')
+        >>> Slice('')
+        Traceback (most recent call last):
+        ...
+        ValueError: Invalid Slice Specification ''
     """
 
     left = field()
@@ -124,7 +121,7 @@ class Slice(mementos):
 
     _RE_STRING = re.compile(r"\[?(?P<left>[^:\]]+)(:(?P<right>[^\]]+))?\]?")
 
-    def __init__(self, left: Optional[Union[int, str]] = None, right: Optional[int] = None) -> None:
+    def __init__(self, left: int | str | None = None, right: int | None = None) -> None:
         if isinstance(left, str):
             assert right is None, right
             mat = Slice._RE_STRING.match(left)
@@ -152,36 +149,36 @@ class Slice(mementos):
 
         These three formats are supported:
 
-        >>> Slice.cast("[15:4]")
-        Slice('15:4')
-        >>> Slice.cast("[4:15]")
-        Slice('4:15')
-        >>> Slice.cast("[16]")
-        Slice('16')
-        >>> Slice.cast(range(4,16))
-        Slice('4:15')
-        >>> Slice.cast(range(15, 3, -1))
-        Slice('15:4')
-        >>> Slice.cast('16')
-        Slice('16')
-        >>> Slice.cast(16)
-        Slice('16')
-        >>> Slice.cast(Slice('16'))
-        Slice('16')
-        >>> Slice.cast('')
-        Traceback (most recent call last):
-          ...
-        ValueError: Invalid Slice Specification ''
-        >>> Slice.cast(None)
-        Traceback (most recent call last):
-          ...
-        ValueError: Invalid Slice Specification None
-        >>> Slice.cast("[4]", direction=DOWN)
-        Slice('4')
-        >>> Slice.cast("[4:15]", direction=DOWN)
-        Traceback (most recent call last):
-          ...
-        ValueError: Slice must be downwards but is 4:15
+            >>> Slice.cast("[15:4]")
+            Slice('15:4')
+            >>> Slice.cast("[4:15]")
+            Slice('4:15')
+            >>> Slice.cast("[16]")
+            Slice('16')
+            >>> Slice.cast(range(4,16))
+            Slice('4:15')
+            >>> Slice.cast(range(15, 3, -1))
+            Slice('15:4')
+            >>> Slice.cast('16')
+            Slice('16')
+            >>> Slice.cast(16)
+            Slice('16')
+            >>> Slice.cast(Slice('16'))
+            Slice('16')
+            >>> Slice.cast('')
+            Traceback (most recent call last):
+            ...
+            ValueError: Invalid Slice Specification ''
+            >>> Slice.cast(None)
+            Traceback (most recent call last):
+            ...
+            ValueError: Invalid Slice Specification None
+            >>> Slice.cast("[4]", direction=DOWN)
+            Slice('4')
+            >>> Slice.cast("[4:15]", direction=DOWN)
+            Traceback (most recent call last):
+            ...
+            ValueError: Slice must be downwards but is 4:15
         """
         slice_ = None
         if isinstance(value, Slice):
@@ -211,14 +208,14 @@ class Slice(mementos):
         """
         Colon separated bits.
 
-        >>> Slice(left=4, right=8).bits
-        '4:8'
-        >>> Slice(left=8, right=4).bits
-        '8:4'
-        >>> Slice(left=4).bits
-        '4'
-        >>> Slice(right=4).bits
-        '4'
+            >>> Slice(left=4, right=8).bits
+            '4:8'
+            >>> Slice(left=8, right=4).bits
+            '8:4'
+            >>> Slice(left=4).bits
+            '4'
+            >>> Slice(right=4).bits
+            '4'
         """
         if self.width > 1:
             return f"{self.left}:{self.right}"
@@ -237,14 +234,14 @@ class Slice(mementos):
         """
         Mask.
 
-        >>> Slice(left=4, right=8).mask
-        496
-        >>> Slice(left=8, right=4).mask
-        496
-        >>> Slice(left=4).mask
-        16
-        >>> Slice(right=4).mask
-        16
+            >>> Slice(left=4, right=8).mask
+            496
+            >>> Slice(left=8, right=4).mask
+            496
+            >>> Slice(left=4).mask
+            16
+            >>> Slice(right=4).mask
+            16
         """
         return ((2**self.width) - 1) << min(self.right, self.left)
 
@@ -253,12 +250,12 @@ class Slice(mementos):
         """
         Direction.
 
-        >>> Slice(left=4, right=8).direction
-        <SliceDirection.UP: 1>
-        >>> Slice(left=8, right=4).direction
-        <SliceDirection.DOWN: 0>
-        >>> Slice(left=4).direction
-        >>> Slice(right=4).direction
+            >>> Slice(left=4, right=8).direction
+            <SliceDirection.UP: 1>
+            >>> Slice(left=8, right=4).direction
+            <SliceDirection.DOWN: 0>
+            >>> Slice(left=4).direction
+            >>> Slice(right=4).direction
         """
         if self.left > self.right:
             return SliceDirection.DOWN
@@ -270,11 +267,11 @@ class Slice(mementos):
         """
         Extract slice value from `word`.
 
-        >>> slice = Slice(left=5, right=1)
-        >>> slice.mask
-        62
-        >>> slice.extract(0x59)
-        12
+            >>> slice = Slice(left=5, right=1)
+            >>> slice.mask
+            62
+            >>> slice.extract(0x59)
+            12
         """
         return (word & self.mask) >> self.right
 
