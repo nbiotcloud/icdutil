@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 nbiotcloud
+# Copyright (c) 2023-2025 nbiotcloud
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-"""Testing Fixtures."""
-
-from pytest import fixture
-
-
-@fixture()
-def myfixture(tmp_path):
-    """Example Fixture."""
-
-    mytmp_path = tmp_path / "mysub"
-    mytmp_path.mkdir(parents=True)
-    (mytmp_path / "myfile.txt").write_text("filecontent")
-
-    yield mytmp_path
+"""
+IC Design Utilities.
+"""
