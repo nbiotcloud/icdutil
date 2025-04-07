@@ -534,7 +534,6 @@ class AddrMap:
         for addrrange in addranges:
             self.__add(addrrange)
 
-    # pylint: disable=too-many-arguments
     def add(
         self,
         item,

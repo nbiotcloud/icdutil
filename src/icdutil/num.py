@@ -223,7 +223,6 @@ def calc_lowest_bit_set(num: int) -> int | None:
     """
     if num:
         bit = 0
-        # pylint: disable=superfluous-parens
         while not (num & 0x1):
             num >>= 1
             bit += 1
@@ -396,7 +395,6 @@ def calc_prev_power_of(value: int, base: int = 2):
     return base**exp
 
 
-# pylint: disable=redefined-outer-name
 def align(
     value: int,
     offset: int | None = None,

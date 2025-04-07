@@ -41,7 +41,6 @@ class AddrRange(mementos):
     item: typing.Any | None = field()
     is_sub: bool = field()
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         baseaddr: int,
@@ -110,7 +109,6 @@ class AddrRange(mementos):
         """
         baseaddr = Hex(baseaddr, width=addrwidth)
         size = Bytes(size)
-        # pylint: disable=no-member
         self.__attrs_init__(baseaddr, size, addrwidth, item, is_sub)
 
     @property

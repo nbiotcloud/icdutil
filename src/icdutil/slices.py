@@ -134,7 +134,6 @@ class Slice(mementos):
             left = right
         elif right is None:
             right = left
-        # pylint: disable=no-member
         self.__attrs_init__(left, right)
 
     @property
